@@ -2,6 +2,8 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from app.ocr import perform_ocr
 from typing import List
+from PIL import Image
+from timeit import default_timer as timer
 
 app = FastAPI()
 
@@ -131,13 +133,24 @@ async def upload_images(files: List[UploadFile] = File(...)):
     response = {}
 
     for file in files:
+        start = timer()
         try:
-            # Save the uploaded image temporarily
-            with open(file.filename, "wb") as image_file:
-                image_file.write(file.file.read())
+            if file.content_type == "image/tiff":
+                # Convert .tiff to .jpeg
+                with open(file.filename, "wb") as image_file:
+                    image_file.write(file.file.read())
+                with Image.open(file.file) as img:
+                    jpeg_path = f"{file.filename.split('.')[0]}.jpeg"
+                    img.convert("RGB").save(jpeg_path)
+                ocr_text = perform_ocr(jpeg_path)
+            else:
+                # Save the uploaded image temporarily
+                with open(file.filename, "wb") as image_file:
+                    image_file.write(file.file.read())
+                ocr_text = perform_ocr(file.filename)
 
             # Perform OCR on the image
-            ocr_text = perform_ocr(file.filename)
+            
             print(ocr_text)
 
             # Classify document type based on OCR text
@@ -151,11 +164,18 @@ async def upload_images(files: List[UploadFile] = File(...)):
 
             # Store the classification results in the response dictionary with the filename as the key
             response[file.filename] = classification_results
+            end = timer()
+            response[file.filename]["Time"] = end - start
+
 
         finally:
             # Remove the temporary image file
             import os
-            os.remove(file.filename)
+            if file.content_type == "image/tiff":
+                os.remove(jpeg_path)
+                os.remove(file.filename)
+            else:
+                os.remove(file.filename)
 
     return JSONResponse(content=response)
 
