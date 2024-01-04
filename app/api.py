@@ -4,6 +4,19 @@ from app.ocr import perform_ocr
 
 app = FastAPI()
 
+def classify_text(text, doc_keywords):
+    matching_types = []
+    for key, keywords_list in doc_keywords.items():
+        for keyword in keywords_list:
+            if keyword in text:
+                matching_types.append(key)
+
+    if not matching_types:
+        return ["Unclassified"]
+    
+    return list(set(matching_types))
+
+
 def classify_document_side(document_type, text, doc_keywords, side):
     classified_side = []
     if document_type not in side or document_type not in doc_keywords:
@@ -29,14 +42,7 @@ def classify_document_side(document_type, text, doc_keywords, side):
     else:
         classified_side.append("Not identified")
         return classified_side
-    
-def classify_text(text, doc_keywords):
-    for key, keywords_list in doc_keywords.items():
-        for keyword in keywords_list:
-            if keyword in text:
-                print(keyword)
-                return key
-    return "Unclassified"
+
 
 @app.post("/upload/image")
 async def upload_image(file: UploadFile = File(...)):
@@ -78,10 +84,16 @@ async def upload_image(file: UploadFile = File(...)):
         document_type = classify_text(ocr_text, doc_keywords=doc_keywords)
 
         # Classify document side based on OCR text and document type
-        document_side = classify_document_side(document_type, ocr_text, doc_keywords, side)
+        response = {}
+        for doc in document_type:
+            doc_side = classify_document_side(doc, ocr_text, doc_keywords, side)
+            try:
+                response[doc].extend(doc_side)
+            except:
+                response[doc] = doc_side
 
-        return JSONResponse(content={"document_type": document_type, "document_side": document_side})
-
+        # return JSONResponse(content={"document_type": document_type, "document_side": document_side})
+        return JSONResponse(content=response)
     finally:
         # Remove the temporary image file
         import os
