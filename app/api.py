@@ -57,7 +57,7 @@ async def upload_image(file: UploadFile = File(...)):
     },
     "pan":
     {
-        "front": ["income tax department of india"],
+        "front": ["income tax department"],
         "back": ["income tax pan services unit", "nsdl"]
     },
     "passport":
