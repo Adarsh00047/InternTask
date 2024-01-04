@@ -5,8 +5,10 @@ from app.ocr import perform_ocr
 app = FastAPI()
 
 def classify_document_side(document_type, text, doc_keywords, side):
+    classified_side = []
     if document_type not in side or document_type not in doc_keywords:
-        return "Invalid document type"
+        classified_side.append("Invalid document type")
+        return classified_side
 
     front_keywords = side[document_type]["front"]
     back_keywords = side[document_type]["back"]
@@ -15,13 +17,18 @@ def classify_document_side(document_type, text, doc_keywords, side):
     back_present = any(keyword in text for keyword in back_keywords)
 
     if front_present and back_present:
-        return "Both front and back"
+        classified_side.append("Front")
+        classified_side.append("Back")
+        return classified_side
     elif front_present:
-        return "Front"
+        classified_side.append("Front")
+        return classified_side
     elif back_present:
-        return "Back"
+        classified_side.append("Back")
+        return classified_side
     else:
-        return "Not identified"
+        classified_side.append("Not identified")
+        return classified_side
     
 def classify_text(text, doc_keywords):
     for key, keywords_list in doc_keywords.items():
