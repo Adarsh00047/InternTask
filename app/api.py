@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from app.ocr import perform_ocr
 from typing import List
@@ -122,7 +122,7 @@ async def upload_images(files: List[UploadFile] = File(...)):
         },
         "aadhar": {
             "front": ["government of india"],
-            "back": ["unique identification authority"]
+            "back": ["help@uidai.gov.in"]
         },
         "pan": {
             "front": ["income tax department", "govt of india"],
