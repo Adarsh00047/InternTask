@@ -110,7 +110,7 @@ def classify_document_side(document_type, text, doc_keywords, side):
 async def upload_images(files: List[UploadFile] = File(...)):
     doc_keywords = {
         "aadhar": ["government of india", "unique identification authority", "uidai", "help@uidai.gov.in"],
-        "pan": ["income tax department", "permanent account number", "income tax pan services unit", "govt of india", "tax"],
+        "pan": ["income tax department", "permanent account number", "income tax pan services unit", "govt of india"],
         "passport": ["nationality", "republic of india", "country code"],
         "voter": ["election commission of india", "epic", "elector", "elector's", "electoral registration officer"]
     }
