@@ -30,7 +30,7 @@ async def upload_images(files: List[UploadFile] = File(...)):
         "aadhar": ["government of india", "unique identification authority", "uidai", "help@uidai.gov.in"],
         "pan": ["income tax department", "permanent account number", "income tax pan services unit", "govt of india", "tax"],
         "passport": ["nationality", "republic of india", "country code"],
-        "voter": ["election commission of india", "epic", "elector", "elector's", "electoral registration officer"]
+        "voter": ["election commission of india", "epic", "elector", "elector's", "electoral registration officer", "clector's"]
     }
 
     response = {}
